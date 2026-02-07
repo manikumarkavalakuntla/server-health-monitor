@@ -32,3 +32,15 @@ echo "Hostname    : $HOSTNAME"
 
 echo "------------------------------------------------------------------------------------------------------------------------------"
 
+print_server_health_metrics(){
+
+	GET_CPU=$(check_cpu_usage)
+	echo "CPU Usage	: $GET_CPU%"
+}
+
+check_cpu_usage(){
+
+	top -bn1 | grep "%Cpu(s)" | awk '{print 100-$8}'
+}
+
+print_server_health_metrics
