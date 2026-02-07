@@ -35,12 +35,33 @@ echo "--------------------------------------------------------------------------
 print_server_health_metrics(){
 
 	GET_CPU=$(check_cpu_usage)
-	echo "CPU Usage	: $GET_CPU%"
+	GET_MEM=$(check_memory_usage)
+	GET_DISK=$(check_disk_usage)
+
+	#echo "CPU Usage	: $GET_CPU%"
+	#echo "Memory Usage : $GET_MEM%"
+	#echo "Disk Usage : $GET_DISK"
+	
+
+	printf "%-15s : %s%% %s\n" "CPU Usage" "$GET_CPU" "[ WARNING ]"
+	printf "%-15s : %s\n" "Memory Usage" "$GET_MEM"
+	printf "%-15s : %s\n" "Disk Usage" "$GET_DISK"
 }
 
 check_cpu_usage(){
 
-	top -bn1 | grep "%Cpu(s)" | awk '{print 100-$8}'
+	#top -bn1 | grep "%Cpu(s)" | awk '{print 100-$8}'
+	mpstat 1 1 | awk '/Average/ {printf "%.2f\n", 100 - $NF}'
+}
+
+check_memory_usage(){
+
+	free  | awk '/Mem:/ {printf "%.2f", (($2-$7)/$2)*100}'
+}
+
+check_disk_usage(){
+
+	df -Th | awk '/\/dev\/sdd/ {printf $6}'
 }
 
 print_server_health_metrics
