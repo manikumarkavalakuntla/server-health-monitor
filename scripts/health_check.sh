@@ -38,14 +38,29 @@ print_server_health_metrics(){
 	GET_MEM=$(check_memory_usage)
 	GET_DISK=$(check_disk_usage)
 
-	#echo "CPU Usage	: $GET_CPU%"
-	#echo "Memory Usage : $GET_MEM%"
-	#echo "Disk Usage : $GET_DISK"
-	
+	CPU_STATUS=""
+	MEM_STATUS=""
+	DISK_STATUS=""
 
-	printf "%-15s : %s%% %s\n" "CPU Usage" "$GET_CPU" "[ WARNING ]"
-	printf "%-15s : %s\n" "Memory Usage" "$GET_MEM"
-	printf "%-15s : %s\n" "Disk Usage" "$GET_DISK"
+	if awk "BEGIN {exit !($GET_CPU >= 90)}"; then
+
+		CPU_STATUS=$(printf "%-15s : %s%% %s" "CPU Usage" "$GET_CPU" "[ CRITICAL ]")
+
+	elif awk "BEGIN {exit !($GET_CPU >= 75)}";then
+
+		CPU_STATUS=$(printf "%-15s : %s%% %s" "CPU Usage" "$GET_CPU" "[ WARNING ]")
+
+	else
+		CPU_STATUS=$(printf "%-15s : %s%% %s" "CPU Usage" "$GET_CPU" "[ OK ]")	
+
+	fi
+
+	printf "%s\n" "$CPU_STATUS"
+
+
+#	printf "%-15s : %s\n" "Memory Usage" "$GET_MEM"
+#	printf "%-15s : %s\n" "Disk Usage" "$GET_DISK"
+
 }
 
 check_cpu_usage(){
@@ -65,3 +80,4 @@ check_disk_usage(){
 }
 
 print_server_health_metrics
+
