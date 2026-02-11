@@ -57,8 +57,21 @@ print_server_health_metrics(){
 
 	printf "%s\n" "$CPU_STATUS"
 
+	if awk "BEGIN {exit !($GET_MEM >= 90)}"; then
 
-#	printf "%-15s : %s\n" "Memory Usage" "$GET_MEM"
+		MEM_STATUS=$(printf "%-15s : %s" "Memory Usage" "$GET_MEM" "[ CRITICAL ]")
+
+	elif awk "BEGIN {exit !($GET_MEM >= 75)}"; then
+
+		MEM_STATUS=$(printf "%-15s : %s" "Memory Usage" "$GET_MEM" "[ WARNING ]")
+	
+	else
+		MEM_STATUS=$(printf "%-15s : %s" "Memory Usage" "$GET_MEM" "[ OK ]")
+
+	fi
+
+	printf "%s\n" "$MEM_STATUS"
+
 #	printf "%-15s : %s\n" "Disk Usage" "$GET_DISK"
 
 }
