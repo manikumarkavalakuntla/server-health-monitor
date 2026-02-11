@@ -59,20 +59,34 @@ print_server_health_metrics(){
 
 	if awk "BEGIN {exit !($GET_MEM >= 90)}"; then
 
-		MEM_STATUS=$(printf "%-15s : %s" "Memory Usage" "$GET_MEM" "[ CRITICAL ]")
+		MEM_STATUS=$(printf "%-15s : %s%% %s" "Memory Usage" "$GET_MEM" "[ CRITICAL ]")
 
 	elif awk "BEGIN {exit !($GET_MEM >= 75)}"; then
 
-		MEM_STATUS=$(printf "%-15s : %s" "Memory Usage" "$GET_MEM" "[ WARNING ]")
+		MEM_STATUS=$(printf "%-15s : %s%% %s" "Memory Usage" "$GET_MEM" "[ WARNING ]")
 	
 	else
-		MEM_STATUS=$(printf "%-15s : %s" "Memory Usage" "$GET_MEM" "[ OK ]")
+		MEM_STATUS=$(printf "%-15s : %s%% %s" "Memory Usage" "$GET_MEM" "[ OK ]")
 
 	fi
 
 	printf "%s\n" "$MEM_STATUS"
 
-#	printf "%-15s : %s\n" "Disk Usage" "$GET_DISK"
+	if awk "BEGIN {exit !($GET_DISK >= 90)}"; then
+
+                DISK_STATUS=$(printf "%-15s : %s%% %s" "DISK Usage" "$GET_DISK" "[ CRITICAL ]")
+
+        elif awk "BEGIN {exit !($GET_DISK >= 75)}";then
+
+                DISK_STATUS=$(printf "%-15s : %s%% %s" "DISK Usage" "$GET_DISK" "[ WARNING ]")
+
+        else
+                DISK_STATUS=$(printf "%-15s : %s%% %s" "DISK Usage" "$GET_DISK" "[ OK ]")
+
+        fi
+
+	printf "%s\n" "$DISK_STATUS"
+
 
 }
 
@@ -89,7 +103,7 @@ check_memory_usage(){
 
 check_disk_usage(){
 
-	df -Th | awk '/\/dev\/sdd/ {printf $6}'
+	df -h / | awk 'NR==2 {gsub("%",""); print $5}'
 }
 
 print_server_health_metrics
